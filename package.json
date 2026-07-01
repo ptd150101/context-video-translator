@@ -1,0 +1,13 @@
+{
+  "name": "context-video-translator",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Chrome MV3 extension for context-aware bilingual subtitles on YouTube and Udemy using OpenAI-compatible translation, WebVTT/timedtext capture, karaoke timing, furigana, and IndexedDB cache.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "kuromoji": "^0.1.2"
+  }
+}
