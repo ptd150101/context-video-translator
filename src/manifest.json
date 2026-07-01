@@ -1,0 +1,75 @@
+{
+  "manifest_version": 3,
+  "name": "Context Video Translator",
+  "version": "0.4.1",
+  "description": "Context-aware bilingual subtitles for YouTube and Udemy using OpenAI-compatible endpoints, karaoke timing, furigana, and local cache.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Context Video Translator",
+    "default_popup": "options.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "youtube-main.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.udemy.com/*",
+        "https://udemy.com/*",
+        "https://*.udemy.com/*"
+      ],
+      "js": [
+        "udemy-main.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true,
+      "match_about_blank": true
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://www.udemy.com/*",
+        "https://udemy.com/*",
+        "https://*.udemy.com/*"
+      ],
+      "js": [
+        "vendor/kuromoji/kuromoji.js",
+        "youtube-content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "vendor/kuromoji/dict/*"
+      ],
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://www.udemy.com/*",
+        "https://udemy.com/*",
+        "https://*.udemy.com/*"
+      ]
+    }
+  ]
+}
