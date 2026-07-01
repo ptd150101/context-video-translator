@@ -14,17 +14,21 @@ async function exists(p) {
   }
 }
 
+async function assembleParts(targetFile) {
+  const partsDir = path.join(dist, `${targetFile}.parts`);
+  if (!(await exists(partsDir))) return;
+  const parts = (await readdir(partsDir)).filter((name) => name.endsWith('.part')).sort();
+  const combined = (await Promise.all(parts.map((name) => readFile(path.join(partsDir, name), 'utf8')))).join('');
+  await writeFile(path.join(dist, targetFile), combined);
+  await rm(partsDir, { recursive: true, force: true });
+}
+
 await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 await cp(src, dist, { recursive: true });
 
-const youtubeContentPartsDir = path.join(dist, 'youtube-content.parts');
-const youtubeContentFile = path.join(dist, 'youtube-content.js');
-if (await exists(youtubeContentPartsDir)) {
-  const parts = (await readdir(youtubeContentPartsDir)).filter((name) => name.endsWith('.js')).sort();
-  const combined = (await Promise.all(parts.map((name) => readFile(path.join(youtubeContentPartsDir, name), 'utf8')))).join('');
-  await writeFile(youtubeContentFile, combined);
-  await rm(youtubeContentPartsDir, { recursive: true, force: true });
+for (const target of ['youtube-content.js', 'background.js', 'udemy-main.js', 'options.html']) {
+  await assembleParts(target);
 }
 
 const kuromojiBuild = path.join(root, 'node_modules', 'kuromoji', 'build', 'kuromoji.js');
@@ -42,11 +46,16 @@ if (await exists(kuromojiDict)) {
 }
 
 const manifest = path.join(dist, 'manifest.json');
+const youtubeContentFile = path.join(dist, 'youtube-content.js');
+const backgroundFile = path.join(dist, 'background.js');
+const udemyMainFile = path.join(dist, 'udemy-main.js');
 const kuromojiJs = path.join(dist, 'vendor', 'kuromoji', 'kuromoji.js');
 const kuromojiBase = path.join(dist, 'vendor', 'kuromoji', 'dict', 'base.dat.gz');
 
 if (!(await exists(manifest))) throw new Error('Build failed: dist/manifest.json missing');
 if (!(await exists(youtubeContentFile))) throw new Error('Build failed: dist/youtube-content.js missing');
+if (!(await exists(backgroundFile))) throw new Error('Build failed: dist/background.js missing');
+if (!(await exists(udemyMainFile))) throw new Error('Build failed: dist/udemy-main.js missing');
 if (!(await exists(kuromojiJs))) throw new Error('Build failed: missing Kuromoji runtime. Run npm install first.');
 if (!(await exists(kuromojiBase))) throw new Error('Build failed: missing Kuromoji dictionary. Run npm install first.');
 
