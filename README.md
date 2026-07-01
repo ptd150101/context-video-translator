@@ -5,6 +5,7 @@ A Chrome/Edge MV3 extension for contextual bilingual subtitles on video-learning
 ## Highlights
 
 - **Context-aware subtitle translation**: translates subtitle batches with neighboring cues so the output is more consistent across a scene or explanation, not just isolated line-by-line translation.
+- **Atomic bilingual rendering**: subtitle updates are treated as a pair. A new original cue is not rendered alone while its translation is still missing; the previous translated cue is held briefly until the next translation is ready.
 - **Realtime bilingual overlay**: original subtitle + translated subtitle rendered directly over the video.
 - **Ahead-of-time translation**: translates upcoming cues before they appear to reduce waiting during playback.
 - **OpenAI-compatible provider**: works with local or cloud endpoints that expose `/v1/chat/completions`.
@@ -104,6 +105,7 @@ This repository intentionally does **not** commit:
 node_modules/
 dist/
 .env
+src/vendor/kuromoji/
 ```
 
 Use `npm install` and `npm run build` locally to regenerate dependencies and build output.
@@ -118,7 +120,6 @@ src/
   udemy-main.js        MAIN-world Udemy network/page bridge
   youtube-content.js   shared platform logic, parsers, renderer, scheduler
   options.*            extension Options UI
-  vendor/kuromoji/     browser Kuromoji runtime + dictionary used by Study Mode
 scripts/
   build.mjs            copies src into dist and prepares runtime files
 ```
