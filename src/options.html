@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realtime Video Subtitle Translator</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>Realtime Video Subtitle Translator</h1>
+        <p>OpenAI-compatible subtitle translation for YouTube and Udemy, with ahead-of-time batching, karaoke timing, furigana, and IndexedDB cache.</p>
+      </div>
+      <span class="badge">YouTube + Udemy</span>
+    </header>
+
+    <section class="card">
+      <h2>Provider</h2>
+      <label class="check-row">
+        <input id="enabled" type="checkbox" />
+        <span>Enable translation</span>
+      </label>
+
+      <label>
+        <span>OpenAI-compatible Base URL</span>
+        <input id="baseUrl" type="text" placeholder="http://localhost:20128/v1" />
+      </label>
+
+      <label>
+        <span>Model</span>
+        <input id="model" type="text" placeholder="cx/gpt-5.4-mini" />
+      </label>
+
+      <label>
+        <span>API key <small>optional for local servers</small></span>
+        <input id="apiKey" type="password" placeholder="sk-... or empty" autocomplete="off" />
+      </label>
+
+      <div class="grid two">
+        <label>
+          <span>Source language</span>
+          <input id="sourceLang" type="text" placeholder="auto" />
+        </label>
+        <label>
+          <span>Target language</span>
+          <input id="targetLang" type="text" placeholder="Vietnamese" />
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Realtime behavior</h2>
+      <div class="grid three">
+        <label>
+          <span>Batch size</span>
+          <input id="batchSize" type="number" min="1" max="50" />
+        </label>
+        <label>
+          <span>Ahead seconds</span>
+          <input id="aheadSeconds" type="number" min="5" max="600" />
+        </label>
+        <label>
+          <span>Temperature</span>
+          <input id="temperature" type="number" min="0" max="2" step="0.1" />
+        </label>
+      </div>
+
+      <div class="grid three">
+        <label>
+          <span>Max retries</span>
+          <input id="maxRetries" type="number" min="0" max="5" />
+        </label>
+        <label>
+          <span>Overlay font size</span>
+          <input id="overlayFontSize" type="number" min="12" max="48" />
+        </label>
+        <label>
+          <span>Cache TTL days</span>
+          <input id="cacheTtlDays" type="number" min="1" max="365" />
+        </label>
+      </div>
+
+      <label class="check-row">
+        <input id="showOriginal" type="checkbox" />
+        <span>Show original subtitle line</span>
+      </label>
+      <label class="check-row">
+        <input id="hideNativeCaptions" type="checkbox" />
+        <span>Hide YouTube native captions <small>recommended</small></span>
+      </label>
+
+      <label class="check-row">
+        <input id="coverHardSub" type="checkbox" />
+        <span>Cover hardcoded subtitles <small>adds a manual mask region</small></span>
+      </label>
+      <div class="grid three">
+        <label>
+          <span>Mask opacity</span>
+          <input id="hardSubMaskOpacity" type="number" min="0" max="1" step="0.05" />
+        </label>
+        <label>
+          <span>Mask blur px</span>
+          <input id="hardSubMaskBlur" type="number" min="0" max="8" step="1" />
+        </label>
+        <label>
+          <span>Mask radius px</span>
+          <input id="hardSubMaskRadius" type="number" min="0" max="32" step="1" />
+        </label>
+      </div>
+      <p class="hint">On YouTube, press <code>Alt+E</code> to edit mask/subtitle regions directly on the video. Press <code>Alt+H</code> to toggle the hard-sub mask.</p>
+
+      <div class="subcard">
+        <h3>Udemy support</h3>
+        <label class="check-row">
+          <input id="enableUdemy" type="checkbox" />
+          <span>Enable on Udemy <small>uses VTT/API/textTrack captions when the lecture has captions</small></span>
+        </label>
+        <div class="grid two">
+          <label>
+            <span>Udemy source caption language</span>
+            <input id="udemySourceLang" type="text" placeholder="auto, ja, Japanese, English..." />
+          </label>
+          <label class="check-row inline-check">
+            <input id="hideUdemyNativeCaptions" type="checkbox" />
+            <span>Hide Udemy native captions <small>experimental, default off</small></span>
+          </label>
+        </div>
+        <p class="hint">Udemy adapter tries network VTT/API discovery first, then native video textTracks/track elements. If a lecture has no captions, the overlay will show a no-captions message.</p>
+      </div>
+
+      <div class="subcard">
+        <h3>Subtitle layout</h3>
+        <label class="check-row">
+          <input id="subtitleDynamicHeight" type="checkbox" />
+          <span>Dynamic subtitle height <small>auto expands to fit 1–2 lines without clipping</small></span>
+        </label>
+        <label class="check-row">
+          <input id="subtitleCompactLayout" type="checkbox" />
+          <span>Compact subtitle layout <small>smaller padding, gap and furigana spacing</small></span>
+        </label>
+        <div class="grid three">
+          <label>
+            <span>Max subtitle height %</span>
+            <input id="subtitleMaxHeightPct" type="number" min="18" max="70" />
+          </label>
+          <label>
+            <span>Grow direction</span>
+            <select id="subtitleAnchor">
+              <option value="auto">Auto</option>
+              <option value="bottom">Grow upward</option>
+              <option value="top">Grow downward</option>
+            </select>
+          </label>
+          <label>
+            <span>Density</span>
+            <select id="subtitleDensity">
+              <option value="comfortable">Comfortable</option>
+              <option value="compact">Compact</option>
+              <option value="ultra">Ultra compact</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint">The manual region now controls the anchor position and width. Height is measured from the rendered subtitle, so furigana and 2-line subtitles should not be truncated.</p>
+      </div>
+
+      <div class="subcard">
+        <h3>Japanese study mode</h3>
+        <label class="check-row">
+          <input id="studyMode" type="checkbox" />
+          <span>Enable Japanese study mode <small>adds furigana and a clean karaoke-style original line</small></span>
+        </label>
+        <label class="check-row">
+          <input id="studyHighlight" type="checkbox" />
+          <span>Analyze Japanese subtitle text</span>
+        </label>
+        <label class="check-row">
+          <input id="studyChunkMode" type="checkbox" />
+          <span>Component boxes <small>grammar study mode; off is cleaner for watching</small></span>
+        </label>
+        <label class="check-row">
+          <input id="studyFurigana" type="checkbox" />
+          <span>Show furigana <small>Kuromoji engine recommended</small></span>
+        </label>
+        <div class="grid three">
+          <label>
+            <span>Furigana engine</span>
+            <select id="studyFuriganaEngine">
+              <option value="auto">Auto: Kuromoji then fallback</option>
+              <option value="kuromoji">Kuromoji</option>
+              <option value="lightweight">Lightweight fallback</option>
+            </select>
+          </label>
+          <label>
+            <span>Furigana style</span>
+            <select id="studyFuriganaStyle">
+              <option value="smart">Smart okurigana split</option>
+              <option value="basic">Basic whole-token ruby</option>
+            </select>
+          </label>
+          <label>
+            <span>Furigana display</span>
+            <select id="studyFuriganaDisplay">
+              <option value="kanji">All Kanji tokens</option>
+              <option value="current">Current speaking chunk only</option>
+              <option value="hover">Tooltip only</option>
+            </select>
+          </label>
+        </div>
+        <label class="check-row">
+          <input id="studyTooltips" type="checkbox" />
+          <span>Show token info on hover</span>
+        </label>
+        <label class="check-row">
+          <input id="studySpeakingHighlight" type="checkbox" />
+          <span>Karaoke progress <small>fills the whole Japanese line from left to right</small></span>
+        </label>
+        <p class="hint">Study mode runs locally. Furigana uses Kuromoji when available and falls back to the lightweight rule engine while the dictionary loads. Karaoke progress tracks the whole original subtitle line, so it stays clean instead of lighting many tiny grammar chunks.</p>
+      </div>
+      <label class="check-row">
+        <input id="cacheEnabled" type="checkbox" />
+        <span>Enable translation cache</span>
+      </label>
+      <label class="check-row">
+        <input id="debug" type="checkbox" />
+        <span>Debug logs</span>
+      </label>
+    </section>
+
+    <section class="card actions">
+      <button id="save" class="primary">Save settings</button>
+      <button id="test">Test connection</button>
+      <button id="clearCache" class="danger">Clear cache</button>
+      <p id="status" role="status"></p>
+    </section>
+
+    <section class="card notes">
+      <h2>How to test</h2>
+      <ol>
+        <li>Open a YouTube video or a Udemy lecture that has captions.</li>
+        <li>On YouTube, turn captions on once so timedtext is requested. On Udemy, open the lecture and enable captions if they do not load automatically.</li>
+        <li>The extension parses the caption track, translates upcoming cues in batches, and renders its own overlay.</li>
+      </ol>
+      <p>For local servers, use LM Studio, llama.cpp, Ollama-compatible OpenAI proxy, vLLM, or any endpoint that supports <code>/v1/chat/completions</code>.</p>
+      <p>Layout shortcuts: <code>Alt+E</code> edit layout, <code>Alt+H</code> toggle hard-sub mask, <code>Alt+S</code> save current video layout, <code>Tab</code> switch selected region, arrow keys move, <code>Shift+Arrow</code> resize.</p>
+    </section>
+  </main>
+
+  <script src="options.js"></script>
+</body>
+</html>

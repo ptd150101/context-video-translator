@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Context Video Translator",
+  "name": "Realtime Bilingual Video Subtitles",
   "version": "0.4.1",
-  "description": "Context-aware bilingual subtitles for YouTube and Udemy using OpenAI-compatible endpoints, karaoke timing, furigana, and local cache.",
+  "description": "Realtime bilingual subtitles for YouTube and Udemy using OpenAI-compatible endpoints, karaoke timing, furigana, and local cache.",
   "permissions": [
     "storage"
   ],
@@ -14,7 +14,7 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Context Video Translator",
+    "default_title": "Realtime Subtitle Translator",
     "default_popup": "options.html"
   },
   "options_page": "options.html",
