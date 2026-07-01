@@ -1,83 +1,59 @@
 # Context Video Translator
 
-A Chrome/Edge MV3 extension for contextual bilingual subtitles on video-learning platforms. It captures official caption tracks, translates upcoming subtitle cues through an OpenAI-compatible API, and renders a stable custom overlay with timing, layout, and study tools.
+Chrome/Edge MV3 extension for context-aware bilingual subtitles on video-learning platforms.
 
 ## Highlights
 
-- **Context-aware subtitle translation**: translates subtitle batches with neighboring cues so the output is more consistent across a scene or explanation, not just isolated line-by-line translation.
-- **Atomic bilingual rendering**: subtitle updates are treated as a pair. A new original cue is not rendered alone while its translation is still missing; the previous translated cue is held briefly until the next translation is ready.
-- **Realtime bilingual overlay**: original subtitle + translated subtitle rendered directly over the video.
-- **Ahead-of-time translation**: translates upcoming cues before they appear to reduce waiting during playback.
-- **OpenAI-compatible provider**: works with local or cloud endpoints that expose `/v1/chat/completions`.
-- **Smart timing**: uses detailed YouTube segment timing when available, falls back to cue-level timing elsewhere.
-- **Karaoke progress**: lightweight left-to-right progress effect for tracking the current spoken line.
-- **Manual layout editor**: move and resize the subtitle overlay and hard-sub cover region directly on the video.
-- **Dynamic compact height**: subtitle box grows only as much as needed, avoiding clipping while saving screen space.
-- **Hard-sub mask**: optional region mask to cover burned-in subtitles before rendering your own overlay.
-- **Japanese study mode**: optional furigana, local Japanese analysis, component coloring, and hover information.
-- **Translation cache**: IndexedDB cache to avoid retranslating the same cues repeatedly.
+- Context-aware subtitle translation with neighboring cues, not isolated line-by-line translation.
+- Atomic bilingual rendering: the source line and translated line update together.
+- Black subtitle output background built directly into the subtitle box.
+- Separate hard-sub cover layer removed.
+- Drag the subtitle output directly in normal mode.
+- Fullscreen overlay support for YouTube and Udemy.
+- YouTube support via timedtext captions.
+- Udemy support via lecture caption API and WebVTT files.
+- Netflix coming soon.
+- Karaoke progress, dynamic compact height, Japanese study mode, furigana, and local translation cache.
 
 ## Supported platforms
 
 | Platform | Status | Notes |
 |---|---:|---|
-| YouTube | Supported | Captures `api/timedtext`, supports json3/XML captions, segment timing, native caption hiding. |
-| Udemy | Supported | Uses the official lecture captions API, `asset.captions[].url`, WebVTT parsing, and a Udemy-specific stable render state. |
-| Netflix | Coming soon | Planned as a separate platform adapter. |
+| YouTube | Supported | timedtext captions, json3/XML parsing, segment timing, fullscreen overlay. |
+| Udemy | Supported | lecture captions API, signed WebVTT, stable render state, fullscreen remount. |
+| Netflix | Coming soon | Planned as a separate adapter. |
 
-## Key features by platform
+## Subtitle output behavior
 
-### YouTube
+The subtitle output is now the only visual subtitle layer. It has a configurable black background and can be dragged directly.
 
-- MAIN-world fetch/XHR interception for `https://www.youtube.com/api/timedtext`.
-- Parses YouTube json3 and legacy XML timedtext.
-- Preserves `segs[].tOffsetMs` when present for smoother karaoke timing.
-- Optional hiding of native YouTube captions.
-- Per-video and global layout presets.
-
-### Udemy
-
-- Detects `courseId` and `lectureId` on lecture pages.
-- Calls Udemy's lecture API to extract `asset.captions[].url`.
-- Fetches signed WebVTT caption files and parses timestamps.
-- Falls back to network-captured VTT, `video.textTracks`, or `<track>` elements when needed.
-- Uses a Udemy-specific render state machine to avoid flicker caused by player/HLS re-renders.
-
-## Japanese Study Mode
-
-Optional tools for Japanese-learning videos:
-
-- Kuromoji-backed furigana engine with lightweight fallback.
-- Smart okurigana split where safe.
-- Furigana display modes: all Kanji, current speaking chunk only, or tooltip-only.
-- Optional component boxes for nouns, verbs, particles, adjectives, auxiliaries, adverbs, and other tokens.
-- Clean karaoke mode for normal watching, with component boxes available for pause-and-study.
+- no separate mask layer;
+- no glass blur;
+- configurable black background opacity;
+- normal-mode drag to reposition;
+- editor mode for resizing;
+- fullscreen remounting;
+- atomic bilingual updates, so source text is not shown alone while translation is pending.
 
 ## Keyboard shortcuts
 
-On supported video pages:
-
 ```text
-Alt+E        Toggle layout editor
-Alt+H        Toggle hard-sub cover mask
+Alt+E        Toggle subtitle output layout editor
 Alt+S        Save current layout
-Esc          Cancel/exit editor
-Tab          Switch selected region in editor
-Arrow keys   Move selected region
-Shift+Arrow  Resize selected region
+Esc          Cancel editor
+Arrow keys   Move subtitle output
+Shift+Arrow  Resize subtitle output
 ```
 
-## Default provider
+In normal mode, hover the subtitle output and drag it to reposition. The new position is saved for the current video or lecture.
 
-The current default OpenAI-compatible endpoint is:
+## Default provider
 
 ```text
 Base URL: http://localhost:20128/v1
 Model: cx/gpt-5.4-mini
 Target language: Vietnamese
 ```
-
-You can change this in the extension Options page.
 
 ## Build
 
@@ -86,20 +62,19 @@ npm install
 npm run build
 ```
 
-The build output is written to `dist/`.
+Build output goes to `dist/`.
 
 ## Load in Chrome or Edge
 
 1. Open `chrome://extensions` or `edge://extensions`.
-2. Enable **Developer mode**.
+2. Enable Developer mode.
 3. Run `npm run build` if `dist/` does not exist.
-4. Click **Load unpacked**.
+4. Click Load unpacked.
 5. Select the `dist/` folder.
-6. Open the extension Options page and configure your provider if needed.
 
 ## Repository hygiene
 
-This repository intentionally does **not** commit:
+Do not commit:
 
 ```text
 node_modules/
@@ -108,25 +83,22 @@ dist/
 src/vendor/kuromoji/
 ```
 
-Use `npm install` and `npm run build` locally to regenerate dependencies and build output.
-
 ## Project structure
 
 ```text
 src/
-  manifest.json        Chrome MV3 manifest source
-  background.js        settings, translation, cache, provider calls
-  youtube-main.js      MAIN-world YouTube timedtext interceptor
-  udemy-main.js        MAIN-world Udemy network/page bridge
-  youtube-content.js   shared platform logic, parsers, renderer, scheduler
-  options.*            extension Options UI
+  manifest.json
+  background.js
+  youtube-main.js
+  udemy-main.js
+  youtube-content.js
+  options.*
 scripts/
-  build.mjs            copies src into dist and prepares runtime files
+  build.mjs
 ```
 
 ## Limitations
 
-- Requires the video platform to expose captions or transcripts; it does not perform OCR or ASR.
+- Requires the platform to expose captions or transcripts.
 - Translation quality and latency depend on the configured model/provider.
 - Platform DOM/API changes may require adapter updates.
-- Netflix support is planned but not implemented yet.
