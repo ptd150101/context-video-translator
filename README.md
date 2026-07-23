@@ -2,6 +2,31 @@
 
 Chrome/Edge MV3 extension for context-aware bilingual subtitles on video-learning platforms.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/images/japanese-study-vietnamese.svg" alt="Japanese study mode with furigana and Vietnamese translation">
+      <br><sub><b>Japanese study mode</b> — furigana, token coloring, karaoke progress, and Vietnamese translation.</sub>
+    </td>
+    <td width="50%">
+      <img src="docs/images/context-translation-vietnamese.svg" alt="Context-aware Japanese to Vietnamese subtitle translation">
+      <br><sub><b>Vietnamese translation</b> — context-aware bilingual subtitles for longer spoken lines.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/images/context-translation-english.svg" alt="Japanese to English bilingual subtitle translation">
+      <br><sub><b>English translation</b> — the source and translated subtitle render atomically.</sub>
+    </td>
+    <td width="50%">
+      <img src="docs/images/multilingual-translation-french.svg" alt="Japanese to French bilingual subtitle translation">
+      <br><sub><b>French translation</b> — switch the target language through the extension settings.</sub>
+    </td>
+  </tr>
+</table>
+
 ## Highlights
 
 - Context-aware subtitle translation with neighboring cues, not isolated line-by-line translation.
