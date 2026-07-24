@@ -10,6 +10,8 @@ on:
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/build-extension-zip.yml"
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
