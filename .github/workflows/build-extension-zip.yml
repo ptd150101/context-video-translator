@@ -1,0 +1,43 @@
+name: Build extension ZIP
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "scripts/build.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/build-extension-zip.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build extension
+        run: npm run build
+
+      - name: Upload extension ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: context-video-translator-v0.4.2
+          path: dist/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 30
