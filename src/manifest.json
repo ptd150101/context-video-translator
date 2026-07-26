@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Realtime Bilingual Video Subtitles",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "description": "Realtime bilingual subtitles for YouTube and Udemy using OpenAI-compatible endpoints, karaoke timing, furigana, and local cache.",
   "permissions": [
     "storage"
@@ -51,10 +51,10 @@
       ],
       "js": [
         "vendor/kuromoji/kuromoji.js",
-        "youtube-diagnostics.js",
         "youtube-caption-event-guard.js",
         "youtube-content.js",
         "youtube-enhancements-v3.js",
+        "youtube-karaoke-word-guard.js",
         "youtube-waiting-suppression.js"
       ],
       "run_at": "document_start",
