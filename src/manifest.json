@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Realtime Bilingual Video Subtitles",
-  "version": "0.4.14",
+  "version": "0.4.15",
   "description": "Realtime bilingual subtitles for YouTube and Udemy using OpenAI-compatible endpoints, karaoke timing, furigana, and local cache.",
   "permissions": [
     "storage"
@@ -54,7 +54,7 @@
         "youtube-caption-event-guard.js",
         "youtube-content.js",
         "youtube-enhancements-v3.js",
-        "youtube-karaoke-line-guard-v5.js",
+        "youtube-karaoke-line-guard-v6.js",
         "youtube-waiting-suppression.js"
       ],
       "run_at": "document_start",
